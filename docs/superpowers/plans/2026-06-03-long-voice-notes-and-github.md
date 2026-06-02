@@ -53,14 +53,14 @@ Expected: `/Users/SGK/Applications/Fast Dictate.app` exists.
 **Files:**
 - Create: `.gitignore`
 
-- [ ] **Step 1: Initialize git and inspect status**
+- [x] **Step 1: Initialize git and inspect status**
 
 Run: `git init`, `git status`, `git diff --stat`, and `git log --oneline -10`.
 
-- [ ] **Step 2: Commit code**
+- [x] **Step 2: Commit code**
 
 Run: `git add . && git commit -m "feat: add local Mac dictation app"`.
 
-- [ ] **Step 3: Create GitHub repo and push**
+- [x] **Step 3: Create GitHub repo and push**
 
 Run: `gh repo create sgk-ctrl/fast-dictation --public --source=. --remote=origin --push`.
