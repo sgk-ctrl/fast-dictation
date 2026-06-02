@@ -85,13 +85,33 @@ func testLongVoiceNotePresetsExist() throws {
     try expect(DictationPreset.extendedNote.duration == 900, "extended note should record for 15 minutes")
 }
 
+func testProductDocsAndFrontendExist() throws {
+    let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+    let prdURL = root.appendingPathComponent("docs/PRD.md")
+    let frontendURL = root.appendingPathComponent("website/index.html")
+    let iconURL = root.appendingPathComponent("Assets/FastDictateIcon.svg")
+
+    try expect(FileManager.default.fileExists(atPath: prdURL.path), "PRD should exist at docs/PRD.md")
+    try expect(FileManager.default.fileExists(atPath: frontendURL.path), "front end should exist at website/index.html")
+    try expect(FileManager.default.fileExists(atPath: iconURL.path), "product icon should exist at Assets/FastDictateIcon.svg")
+
+    let prd = try String(contentsOf: prdURL, encoding: .utf8)
+    let frontend = try String(contentsOf: frontendURL, encoding: .utf8)
+    let icon = try String(contentsOf: iconURL, encoding: .utf8)
+
+    try expect(prd.contains("## Goals") && prd.contains("## Non-Goals") && prd.contains("## Success Metrics"), "PRD should include core product sections")
+    try expect(frontend.contains("Fast Dictate") && frontend.contains("Assets/FastDictateIcon.svg"), "front end should name the product and reference the icon")
+    try expect(icon.contains("<svg") && icon.contains("Fast Dictate"), "icon should be an accessible SVG")
+}
+
 let tests: [(String, () throws -> Void)] = [
     ("parses explicit options", testParsesExplicitOptions),
     ("uses environment defaults", testUsesEnvironmentDefaults),
     ("rejects invalid duration", testRejectsInvalidDuration),
     ("cleans whitespace and timestamps", testCleansWhitespaceAndTimestamps),
     ("mac app files exist", testMacAppFilesExist),
-    ("long voice note presets exist", testLongVoiceNotePresetsExist)
+    ("long voice note presets exist", testLongVoiceNotePresetsExist),
+    ("product docs and frontend exist", testProductDocsAndFrontendExist)
 ]
 
 do {

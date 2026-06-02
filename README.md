@@ -4,6 +4,13 @@ Local-first Mac dictation MVP for an M1 MacBook Air with 16GB RAM.
 
 It records microphone audio, transcribes it locally through `whisper.cpp`, copies the transcript to the clipboard, and can paste into the active app.
 
+## Product Docs And Front End
+
+- Product requirements: [`docs/PRD.md`](docs/PRD.md)
+- Design context: [`PRODUCT.md`](PRODUCT.md) and [`DESIGN.md`](DESIGN.md)
+- Landing page: [`website/index.html`](website/index.html)
+- Product icon: [`Assets/FastDictateIcon.svg`](Assets/FastDictateIcon.svg)
+
 ## Install Dependencies
 
 ```sh

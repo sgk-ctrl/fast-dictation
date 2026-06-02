@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fast Dictate | Local Mac voice notes</title>
+  <meta name="description" content="Fast Dictate is a local-first macOS dictation app for short dictation and long private voice notes.">
+  <link rel="icon" href="../Assets/FastDictateIcon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: oklch(17% 0.014 74);
+      --panel: oklch(22% 0.018 74);
+      --panel-2: oklch(28% 0.024 72);
+      --paper: oklch(93% 0.018 84);
+      --muted: oklch(76% 0.025 78);
+      --quiet: oklch(61% 0.025 78);
+      --amber: oklch(76% 0.17 72);
+      --amber-soft: oklch(84% 0.12 82);
+      --copper: oklch(58% 0.13 46);
+      --green: oklch(72% 0.11 142);
+      --line: oklch(38% 0.025 74);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 0%, oklch(44% 0.08 52 / 0.5), transparent 28rem),
+        radial-gradient(circle at 90% 8%, oklch(38% 0.09 88 / 0.5), transparent 24rem),
+        linear-gradient(135deg, oklch(18% 0.014 74), oklch(12% 0.012 74));
+      color: var(--paper);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: clamp(56px, 9vw, 112px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--paper);
+      text-decoration: none;
+      font-weight: 720;
+      letter-spacing: -0.03em;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+    }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--paper); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(340px, 0.78fr);
+      gap: clamp(32px, 6vw, 82px);
+      align-items: center;
+    }
+
+    .kicker {
+      color: var(--amber-soft);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 760;
+      margin: 0 0 18px;
+    }
+
+    h1 {
+      max-width: 790px;
+      margin: 0;
+      font-size: clamp(52px, 8.3vw, 112px);
+      line-height: 0.9;
+      letter-spacing: -0.08em;
+      text-wrap: balance;
+    }
+
+    .lead {
+      max-width: 670px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: clamp(19px, 2.1vw, 25px);
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 760;
+      letter-spacing: -0.02em;
+      transition: transform 180ms cubic-bezier(.22, 1, .36, 1), border-color 180ms cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .button:hover { transform: translateY(-2px); }
+
+    .primary {
+      background: var(--amber);
+      color: oklch(17% 0.014 74);
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      color: var(--paper);
+      background: oklch(27% 0.02 74 / 0.55);
+    }
+
+    .recorder {
+      position: relative;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background: linear-gradient(180deg, oklch(29% 0.022 74 / 0.9), oklch(20% 0.014 74 / 0.94));
+      box-shadow: 0 36px 90px oklch(6% 0.02 74 / 0.44);
+    }
+
+    .recorder::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 26px;
+      border: 1px solid oklch(72% 0.08 72 / 0.16);
+      pointer-events: none;
+    }
+
+    .meter-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--amber-soft);
+      font-weight: 760;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 8px oklch(76% 0.17 72 / 0.13);
+    }
+
+    .wave {
+      display: grid;
+      grid-template-columns: repeat(21, 1fr);
+      gap: 7px;
+      height: 210px;
+      align-items: center;
+      padding: 22px 12px;
+      border-radius: 24px;
+      background: oklch(15% 0.014 74 / 0.72);
+      overflow: hidden;
+    }
+
+    .wave span {
+      display: block;
+      height: var(--h);
+      min-height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--amber-soft), var(--copper));
+    }
+
+    .transcript {
+      margin-top: 18px;
+      padding: 20px;
+      border-radius: 22px;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .transcript strong { display: block; margin-bottom: 8px; }
+
+    .strip {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: clamp(24px, 5vw, 70px);
+      margin-top: clamp(72px, 11vw, 132px);
+      align-items: start;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+      text-wrap: balance;
+    }
+
+    .principles {
+      display: grid;
+      gap: 1px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      overflow: hidden;
+      background: var(--line);
+    }
+
+    .principle {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 22px;
+      padding: 24px;
+      background: oklch(21% 0.016 74 / 0.92);
+    }
+
+    .principle b {
+      color: var(--amber-soft);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .principle p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .install {
+      margin-top: clamp(72px, 10vw, 120px);
+      padding: clamp(24px, 5vw, 48px);
+      border-radius: 34px;
+      background: var(--paper);
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .install h2 { color: var(--ink); }
+    .install p { color: oklch(42% 0.018 74); line-height: 1.55; }
+
+    pre {
+      margin: 0;
+      padding: 22px;
+      border-radius: 22px;
+      overflow-x: auto;
+      background: oklch(18% 0.014 74);
+      color: oklch(89% 0.02 84);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    footer {
+      margin-top: 48px;
+      color: var(--quiet);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 850px) {
+      header, footer { align-items: flex-start; flex-direction: column; }
+      nav { flex-wrap: wrap; }
+      .hero, .strip, .install { grid-template-columns: 1fr; }
+      .principle { grid-template-columns: 1fr; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <a class="brand" href="#top" aria-label="Fast Dictate home">
+        <img src="../Assets/FastDictateIcon.svg" alt="Fast Dictate icon">
+        <span>Fast Dictate</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="../docs/PRD.md">PRD</a>
+        <a href="../README.md">Install</a>
+        <a href="https://github.com/sgk-ctrl/fast-dictation">GitHub</a>
+      </nav>
+    </header>
+
+    <section class="hero" id="top">
+      <div>
+        <p class="kicker">Local Mac dictation for long thoughts</p>
+        <h1>Speak into your Mac. Keep the audio on your Mac.</h1>
+        <p class="lead">Fast Dictate turns short commands and long voice notes into text using local Whisper transcription. No account, no cloud audio, no meeting bot energy.</p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/sgk-ctrl/fast-dictation">Get the code</a>
+          <a class="button secondary" href="../docs/PRD.md">Read the PRD</a>
+        </div>
+      </div>
+
+      <aside class="recorder" aria-label="Recording preview">
+        <div class="meter-top">
+          <span class="live"><span class="dot"></span> Recording locally</span>
+          <span>15:00 preset</span>
+        </div>
+        <div class="wave" aria-hidden="true">
+          <span style="--h: 38%"></span><span style="--h: 66%"></span><span style="--h: 28%"></span><span style="--h: 81%"></span><span style="--h: 51%"></span><span style="--h: 92%"></span><span style="--h: 43%"></span><span style="--h: 74%"></span><span style="--h: 31%"></span><span style="--h: 68%"></span><span style="--h: 96%"></span><span style="--h: 58%"></span><span style="--h: 35%"></span><span style="--h: 87%"></span><span style="--h: 54%"></span><span style="--h: 76%"></span><span style="--h: 40%"></span><span style="--h: 63%"></span><span style="--h: 29%"></span><span style="--h: 72%"></span><span style="--h: 46%"></span>
+        </div>
+        <div class="transcript">
+          <strong>Copied to Notes</strong>
+          The useful part of dictation is not recording. It is getting a messy thought into the place you were already writing.
+        </div>
+      </aside>
+    </section>
+
+    <section class="strip" aria-labelledby="why-title">
+      <h2 id="why-title">Built like a utility, not a surveillance room.</h2>
+      <div class="principles">
+        <div class="principle">
+          <b>Private</b>
+          <p>Audio is recorded and transcribed locally through `whisper.cpp`. The default path does not need an account or API key.</p>
+        </div>
+        <div class="principle">
+          <b>Long-form</b>
+          <p>Use quick dictation for a sentence, or 1-minute, 5-minute, and 15-minute presets for voice notes that need room.</p>
+        </div>
+        <div class="principle">
+          <b>Direct</b>
+          <p>The transcript lands on your clipboard and can paste into the active app, so the tool does not become another inbox.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="install" aria-labelledby="install-title">
+      <div>
+        <h2 id="install-title">Run the Mac app.</h2>
+        <p>Build the menu bar app, open it, then pick a duration from the Dictate menu. For the longest test, choose Extended Voice Note 15 Minutes.</p>
+      </div>
+      <pre><code>cd ~/fast-dictation
+scripts/build-app.sh
+open "$HOME/Applications/Fast Dictate.app"</code></pre>
+    </section>
+
+    <footer>
+      <span>Fast Dictate: local voice notes for macOS.</span>
+      <span>Designed for private thought capture.</span>
+    </footer>
+  </main>
+</body>
+</html>
